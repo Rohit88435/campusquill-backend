@@ -62,23 +62,15 @@ export const signup = async (req, res) => {
 export const login = async (req, res) => {
   try {
     let { email, password } = req.body;
-
     let existUser = await User.findOne({ email });
-
     if (!existUser) {
       return res.status(400).json({ message: "User doesn't exist" });
     }
-
     let match = await bcrypt.compare(password, existUser.password);
-
     if (!match) {
       return res.status(400).json({ message: "Password incorrect" });
     }
-
-    let token;
-
-    token = await getToken(existUser._id);
-
+    let token = await getToken(existUser._id);
     const userWithoutPassword = { ...existUser._doc };
     delete userWithoutPassword.password;
     res.cookie("token", token, {
@@ -89,9 +81,10 @@ export const login = async (req, res) => {
     });
     return res
       .status(201)
-      .json({ user: userWithoutPassword, message: "login/signup successful" });
+      .json({ user: userWithoutPassword, message: "login Successfully" });
   } catch (error) {
-    return res.status(500).json({ message: "Login error" });
+    console.log("Login error:", error);
+    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
